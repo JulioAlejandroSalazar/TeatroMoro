@@ -5,10 +5,11 @@ import java.util.Scanner;
 public class Main {
 
     static int entradasVendidas = 0;
+    static String boletaFinal = "";
 
     static Scanner scan = new Scanner(System.in);
     public static void main(String[] args) {
-        String green="\033[32m";
+
         int opcion = 0;
 
         do {
@@ -45,6 +46,10 @@ public class Main {
         double descuentoEdad = 0;        
         double descuentoEntradasVendidas = 0;
         int precioFinal = 0;
+        String aplicaDescuentoEstudiante = "";
+        String aplicaDescuentoEdad = "";
+        String aplicaDescuentoEntradasVendidas = "";
+        String boleta = "";
 
     
         System.out.println("Por favor ingrese los datos solicitados");
@@ -52,7 +57,7 @@ public class Main {
         /* Se hace un do-while loop para preguntar al usuario por el tipo
         de entrada hasta que ingrese una correctamente
         
-        En la linea 63 Se lee lo que escribio el usuario,
+        En la linea 69 Se lee lo que escribio el usuario,
         se lleva a letras minusculas con "toLowerCase()" y se eliminan
         los espacios vacios del principio y el final con "trim()" */
 
@@ -140,37 +145,46 @@ public class Main {
         Y al final le damos el precio al usuario y nos despedimos
         Se repite el mismo proceso hasta que el usuario presione 3 (salir)
         */
-        System.out.println("\n" + "-------------------------------------------------------------");
-        System.out.println("Zona: " + tipoDeEntrada);
-        System.out.println("Precio base: " + precioZona);
         if (descuentoEstudiante != 0)
-            System.out.println("Descuento estudiante: 10%");
+            aplicaDescuentoEstudiante = "Descuento estudiante: 10%";
         else
-            System.out.println("Descuento estudiante: No aplica");
+            aplicaDescuentoEstudiante = "Descuento estudiante: No aplica";
+
         if (descuentoEdad != 0)
-            System.out.println("Descuento mayor de edad: 15%");
+            aplicaDescuentoEdad = "Descuento mayor de edad: 15%";
         else
-            System.out.println("Descuento mayor de edad: No aplica");
+            aplicaDescuentoEdad = "Descuento mayor de edad: No aplica";
+
         if (descuentoEntradasVendidas != 0)
-            System.out.println("Descuento multiples entradas compradas: 20%");
+            aplicaDescuentoEntradasVendidas = "Descuento multiples entradas compradas: 20%";
         else
-            System.out.println("Descuento multiples entradas compradas: No aplica");
-        System.out.println("El total a pagar es : $" + precioFinal + " pesos" + "\n" + "Gracias por su compra, disfrute de la funcion");
-        System.out.println("-------------------------------------------------------------" + "\n");
+            aplicaDescuentoEntradasVendidas = "Descuento multiples entradas compradas: No aplica";
+
+        boleta = ("\n" + "-------------------------------------------------------------" + "\n" +
+                    "Zona: " + tipoDeEntrada + "\n" +
+                    "Precio base: " + precioZona + "\n" +
+                    aplicaDescuentoEstudiante + "\n" +
+                    aplicaDescuentoEdad + "\n" +
+                    aplicaDescuentoEntradasVendidas + "\n" +
+                    "El total a pagar es : $" + precioFinal + " pesos" + "\n" + "Gracias por su compra, disfrute de la funcion" + "\n" +
+                    "-------------------------------------------------------------" + "\n");
+
+        System.out.println(boleta);     //La compra que acaba de hacer
+
+        boletaFinal += boleta;      //Se guarda la compra junto a las otras que haga
     }
 
     static void descuentos() {
 
-        String azul="\033[34m";
         System.out.println("\n" + "-------------------------------------------------------------");
         System.out.println("TEATRO MORO");
-        System.out.println(azul+"LISTA DE PRECIOS");
+        System.out.println("LISTA DE PRECIOS");
         System.out.println("VIP: $25.000");
         System.out.println("Platea baja: $19.000");
         System.out.println("Platea alta: $11.000");
         System.out.println("Palco: $7.200");
-        System.out.println("");
-        System.out.println(azul+"DESCUENTOS");
+        System.out.println();
+        System.out.println("DESCUENTOS");
         System.out.println("Estudiante: 10%");
         System.out.println("Tercera edad (a partir de 60 años): 15%");
         System.out.println("Promocion compra 3 entradas o mas: 20%");
@@ -179,7 +193,8 @@ public class Main {
     }
     
     static void salir() {
-
+        System.out.println("Sus boletas:");     //se muestran todas las compras que realizo
+        System.out.println(boletaFinal);
         System.out.println("Gracias por preferirnos"); 
 
     }    
