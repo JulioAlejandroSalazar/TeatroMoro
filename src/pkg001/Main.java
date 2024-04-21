@@ -1,11 +1,19 @@
 package pkg001;
 
 import java.util.Scanner;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.ArrayList;
 
 public class Main {
 
     static int entradasVendidas = 0;
-    static String boletaFinal = "";
+    static List<String> boletaFinal = new ArrayList<>();
+    static int gastoTotal = 0;
+    static int precioNeto=0;
+    static int iva=0;
+    static String azul="\033[34m";
 
     static Scanner scan = new Scanner(System.in);
     public static void main(String[] args) {
@@ -57,7 +65,7 @@ public class Main {
         /* Se hace un do-while loop para preguntar al usuario por el tipo
         de entrada hasta que ingrese una correctamente
         
-        En la linea 69 Se lee lo que escribio el usuario,
+        En la linea 72 Se lee lo que escribio el usuario,
         se lleva a letras minusculas con "toLowerCase()" y se eliminan
         los espacios vacios del principio y el final con "trim()" */
 
@@ -65,7 +73,7 @@ public class Main {
         
         
         do {
-            System.out.print("Indique tipo de entrada (VIP, Platea alta, Platea baja o Palcos): ");  
+            System.out.print("Indique tipo de entrada (VIP, Platea baja, Platea alta o Palco): ");  
             tipoDeEntrada = scan.nextLine().toLowerCase().trim();
             switch (tipoDeEntrada) {
                 case "vip":
@@ -83,7 +91,7 @@ public class Main {
                     match = true;
                     break;
 
-                case "palcos":
+                case "palco":
                     precioZona = 7200;
                     match = true;
                     break;
@@ -141,37 +149,35 @@ public class Main {
 
         precioFinal = (int)(precioZona - descuentoEdad - descuentoEstudiante - descuentoEntradasVendidas);
         
-        /*
-        Y al final le damos el precio al usuario y nos despedimos
-        Se repite el mismo proceso hasta que el usuario presione 3 (salir)
-        */
+        
+        gastoTotal += precioFinal;       //se suma el precio final al gasto total
+        precioNeto = (int) Math.round(gastoTotal/1.19);
+        iva = (int) Math.round((gastoTotal/1.19) * 0.19);
+        
+        //Y al final le damos el precio al usuario y nos despedimos
+        //Se repite el mismo proceso hasta que el usuario presione 3 (salir)
+
         if (descuentoEstudiante != 0)
-            aplicaDescuentoEstudiante = "Descuento estudiante: 10%";
-        else
-            aplicaDescuentoEstudiante = "Descuento estudiante: No aplica";
+            aplicaDescuentoEstudiante = "Descuento Estudiante: 10%" + "\n";
 
         if (descuentoEdad != 0)
-            aplicaDescuentoEdad = "Descuento mayor de edad: 15%";
-        else
-            aplicaDescuentoEdad = "Descuento mayor de edad: No aplica";
+            aplicaDescuentoEdad = "Descuento Tercera edad: 15%" + "\n";
 
         if (descuentoEntradasVendidas != 0)
-            aplicaDescuentoEntradasVendidas = "Descuento multiples entradas compradas: 20%";
-        else
-            aplicaDescuentoEntradasVendidas = "Descuento multiples entradas compradas: No aplica";
+            aplicaDescuentoEntradasVendidas = "Promocion compra 3 entradas o mas: 20%" + "\n";
 
-        boleta = ("\n" + "-------------------------------------------------------------" + "\n" +
+        boleta = ("----------------------------------"+"\n"+
                     "Zona: " + tipoDeEntrada + "\n" +
-                    "Precio base: " + precioZona + "\n" +
-                    aplicaDescuentoEstudiante + "\n" +
-                    aplicaDescuentoEdad + "\n" +
-                    aplicaDescuentoEntradasVendidas + "\n" +
-                    "El total a pagar es : $" + precioFinal + " pesos" + "\n" + "Gracias por su compra, disfrute de la funcion" + "\n" +
-                    "-------------------------------------------------------------" + "\n");
+                    "Precio base: $" + precioZona + "\n" +
+                    aplicaDescuentoEstudiante +
+                    aplicaDescuentoEdad +
+                    aplicaDescuentoEntradasVendidas +
+                    "Precio final: $" + precioFinal + " pesos" + "\n" +
+                    "----------------------------------"+"\n");
 
         System.out.println(boleta);     //La compra que acaba de hacer
 
-        boletaFinal += boleta;      //Se guarda la compra junto a las otras que haga
+        boletaFinal.add(boleta);      //Se guarda la compra junto a las otras que haga
     }
 
     static void descuentos() {
@@ -193,9 +199,24 @@ public class Main {
     }
     
     static void salir() {
-        System.out.println("Sus boletas:");     //se muestran todas las compras que realizo
-        System.out.println(boletaFinal);
-        System.out.println("Gracias por preferirnos"); 
+        String dateTime = DateTimeFormatter.ofPattern("      dd-MM-yyy, HH:mm ").format(LocalDateTime.now());
+        System.out.println();
+        System.out.println(azul+"DETALLE DE COMPRA:");     //se muestran todas las compras que realizo
+        for(int i = 0; i < boletaFinal.size(); i++) {
+            System.out.println(boletaFinal.get(i));
+        }
+        System.out.println(azul+"===== BOLETA ELECTRONICA =====");
+        System.out.println(azul+"=====     TEATRO MORO    =====");
+        System.out.println(   dateTime);
+        System.out.println("");
+        System.out.println("      Entradas compradas: "+entradasVendidas);
+        System.out.println("");
+        System.out.println("      Neto  : $"+precioNeto); 
+        System.out.println("      IVA   : $"+iva);
+        System.out.println("      TOTAL : $"+gastoTotal);
+        System.out.println("");        
+        System.out.println("");
+        System.out.println(azul+"=== GRACIAS POR PREFERIRNOS ==="); 
 
     }    
 }
