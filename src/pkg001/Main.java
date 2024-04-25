@@ -11,20 +11,19 @@ public class Main {
     static int entradasVendidas = 0;
     static List<String> boletaFinal = new ArrayList<>();
     static int gastoTotal = 0;
-    static int precioNeto=0;
-    static int iva=0;
-    static String azul="\033[34m";
 
     static Scanner scan = new Scanner(System.in);
     public static void main(String[] args) {
-
+        
         int opcion = 0;
 
         do {
             System.out.println("Bienvenido al Teatro MORO, elija una de las siguientes opciones:");
-            System.out.println("1. Comprar");
-            System.out.println("2. Lista de precios y descuentos");
-            System.out.println("3. Salir");
+            System.out.println("1. Comprar boleto");
+            System.out.println("2. Editar boleto");
+            System.out.println("3. Anular boleto");
+            System.out.println("4. Lista de precios y descuentos");
+            System.out.println("5. Salir y pagar");
             opcion = scan.nextInt();
             scan.nextLine(); // Consume el carácter de nueva línea
             switch (opcion) {
@@ -32,19 +31,25 @@ public class Main {
                     comprar();
                     break;
                 case 2:
-                    descuentos();
+                    editar();
                     break;
                 case 3:
+                    borrar();
+                    break;
+                case 4:
+                    descuentos();
+                    break;
+                case 5:
                     salir();
                     break;
                 default:
                     System.out.println("Debe ingresar una opcion valida");    
             }        
-        } while (opcion != 3);
+        } while (opcion != 5);
 
     }
 
-    static void comprar() {
+    static String comprar() {
         
         String tipoDeEntrada = "";                  //Definiendo las variables necesarias
         String tarifa = "";
@@ -52,11 +57,9 @@ public class Main {
         int precioZona = 0;
         double descuentoEstudiante = 0;
         double descuentoEdad = 0;        
-        double descuentoEntradasVendidas = 0;
         int precioFinal = 0;
         String aplicaDescuentoEstudiante = "";
         String aplicaDescuentoEdad = "";
-        String aplicaDescuentoEntradasVendidas = "";
         String boleta = "";
 
     
@@ -138,21 +141,16 @@ public class Main {
 
         entradasVendidas++;     //al terminar la compra se suma una entrada vendida
 
-        if(entradasVendidas >= 3)        //se verifican los descuentos uno por uno independientes del otro
-            descuentoEntradasVendidas = precioZona * 0.2;
-
         if(descuentoEstudiante != 0)
             descuentoEstudiante = precioZona * 0.1;
 
         if(descuentoEdad != 0)
             descuentoEdad = precioZona * 0.15;
 
-        precioFinal = (int)(precioZona - descuentoEdad - descuentoEstudiante - descuentoEntradasVendidas);
+        precioFinal = (int)(precioZona - descuentoEdad - descuentoEstudiante);
         
         
         gastoTotal += precioFinal;       //se suma el precio final al gasto total
-        precioNeto = (int) Math.round(gastoTotal/1.19);
-        iva = (int) Math.round((gastoTotal/1.19) * 0.19);
         
         //Y al final le damos el precio al usuario y nos despedimos
         //Se repite el mismo proceso hasta que el usuario presione 3 (salir)
@@ -163,21 +161,81 @@ public class Main {
         if (descuentoEdad != 0)
             aplicaDescuentoEdad = "Descuento Tercera edad: 15%" + "\n";
 
-        if (descuentoEntradasVendidas != 0)
-            aplicaDescuentoEntradasVendidas = "Promocion compra 3 entradas o mas: 20%" + "\n";
-
         boleta = ("----------------------------------"+"\n"+
                     "Zona: " + tipoDeEntrada + "\n" +
-                    "Precio base: $" + precioZona + "\n" +
+                    "Precio base: $ " + precioZona + "\n" +
                     aplicaDescuentoEstudiante +
                     aplicaDescuentoEdad +
-                    aplicaDescuentoEntradasVendidas +
-                    "Precio final: $" + precioFinal + " pesos" + "\n" +
+                    "Precio final: $ " + precioFinal + " pesos" + "\n" +
                     "----------------------------------"+"\n");
 
         System.out.println(boleta);     //La compra que acaba de hacer
 
         boletaFinal.add(boleta);      //Se guarda la compra junto a las otras que haga
+
+        return(boleta);
+    }
+
+    static void editar() {
+        
+        if(boletaFinal.size() == 0) {
+            System.out.println("\n" + "-----------------------------------------------------");
+            System.out.println("Debe comprar un boleto primero");
+            System.out.println("-----------------------------------------------------" + "\n");
+        } else {
+            System.out.println("Por favor indique el numero del boleto que quiere editar");
+            System.out.println("(El primero boleto es el 0, el segundo el 1 y asi sucesivamente)");
+            System.out.println("(Los boletos que edite estaran en la posicion mas alta de la lista)");
+
+            int numeroBoleto = -1;
+            numeroBoleto = scan.nextInt();
+    
+            while(numeroBoleto < 0 || numeroBoleto >= boletaFinal.size()) {
+                System.out.println("Por favor ingrese un numero valido: ");
+                numeroBoleto = scan.nextInt();
+            }
+            
+            scan.nextLine();
+            entradasVendidas--;     //se resta una entrada al total de entradas vendidas
+            String[] precioBoleta = boletaFinal.get(numeroBoleto).split(" ");      //se hace una lista del boleto separado por espacios
+            gastoTotal -= Integer.valueOf(precioBoleta[precioBoleta.length - 2]);     //se resta el precio del boleto al gasto total
+            boletaFinal.remove(numeroBoleto);     //se elimina el boleto viejo
+            comprar();      //se compra uno nuevo
+
+            System.out.println("-----------------------------------------------------");
+            System.out.println("Boleto editado exitosamente");
+            System.out.println("-----------------------------------------------------" + "\n");           
+            
+        }
+    }
+
+    static void borrar() {
+
+        if(boletaFinal.size() == 0) {
+            System.out.println("\n" + "-----------------------------------------------------");
+            System.out.println("Debe comprar un boleto primero");
+            System.out.println("-----------------------------------------------------" + "\n");
+        } else {
+            System.out.println("Por favor indique el numero del boleto que quiere anular");
+            System.out.println("(El primer boleto es el 0, el segundo el 1 y asi sucesivamente)");
+    
+            int numeroBoleto = -1;
+            numeroBoleto = scan.nextInt();
+    
+            while(numeroBoleto < 0 || numeroBoleto >= boletaFinal.size()) {
+                System.out.println("Por favor ingrese un numero valido: ");
+                numeroBoleto = scan.nextInt();
+            }
+
+            entradasVendidas--;     //se resta una entrada al total de entradas vendidas
+            String[] precioBoleta = boletaFinal.get(numeroBoleto).split(" ");      //se hace una lista del boleto separado por espacios
+            gastoTotal -= Integer.valueOf(precioBoleta[precioBoleta.length - 2]);     //se resta el precio del boleto al gasto total
+            boletaFinal.remove(numeroBoleto);       //se elimina el boleto
+            System.out.println("\n" + "-----------------------------------------------------");
+            System.out.println("Boleto eliminado exitosamente");
+            System.out.println("-----------------------------------------------------" + "\n");
+        }
+
     }
 
     static void descuentos() {
@@ -193,7 +251,6 @@ public class Main {
         System.out.println("DESCUENTOS");
         System.out.println("Estudiante: 10%");
         System.out.println("Tercera edad (a partir de 60 años): 15%");
-        System.out.println("Promocion compra 3 entradas o mas: 20%");
         System.out.println("-------------------------------------------------------------" + "\n");
 
     }
@@ -201,22 +258,21 @@ public class Main {
     static void salir() {
         String dateTime = DateTimeFormatter.ofPattern("      dd-MM-yyy, HH:mm ").format(LocalDateTime.now());
         System.out.println();
-        System.out.println(azul+"DETALLE DE COMPRA:");     //se muestran todas las compras que realizo
-        for(int i = 0; i < boletaFinal.size(); i++) {
+        System.out.println("DETALLE DE COMPRA:");     //se muestran todas las compras que realizo
+        int boletaFinalSize = boletaFinal.size();       //se optimiza el codigo
+        for(int i = 0; i < boletaFinalSize; i++) {
             System.out.println(boletaFinal.get(i));
         }
-        System.out.println(azul+"===== BOLETA ELECTRONICA =====");
-        System.out.println(azul+"=====     TEATRO MORO    =====");
-        System.out.println(   dateTime);
-        System.out.println("");
-        System.out.println("      Entradas compradas: "+entradasVendidas);
-        System.out.println("");
-        System.out.println("      Neto  : $"+precioNeto); 
-        System.out.println("      IVA   : $"+iva);
-        System.out.println("      TOTAL : $"+gastoTotal);
-        System.out.println("");        
-        System.out.println("");
-        System.out.println(azul+"=== GRACIAS POR PREFERIRNOS ==="); 
+        System.out.println("===== BOLETA ELECTRONICA =====");
+        System.out.println("=====     TEATRO MORO    =====");
+        System.out.println(dateTime);
+        System.out.println();
+        System.out.println("      Entradas compradas: " + entradasVendidas);
+        System.out.println();
+        System.out.println("      TOTAL : $" + gastoTotal);
+        System.out.println();        
+        System.out.println();
+        System.out.println("=== GRACIAS POR PREFERIRNOS ==="); 
 
     }    
 }
