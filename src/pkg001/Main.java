@@ -9,7 +9,7 @@ import java.util.ArrayList;
 public class Main {
 
     static int entradasVendidas = 0;
-    static List<String> boletaFinal = new ArrayList<>();
+    static List<Boleto> boletaFinal = new ArrayList<>();
     static int gastoTotal = 0;
 
     static Scanner scan = new Scanner(System.in);
@@ -49,7 +49,7 @@ public class Main {
 
     }
 
-    static String comprar() {
+    static void comprar() {
         
         String tipoDeEntrada = "";                  //Definiendo las variables necesarias
         String tarifa = "";
@@ -60,7 +60,6 @@ public class Main {
         int precioFinal = 0;
         String aplicaDescuentoEstudiante = "";
         String aplicaDescuentoEdad = "";
-        String boleta = "";
 
     
         System.out.println("Por favor ingrese los datos solicitados");
@@ -68,12 +67,11 @@ public class Main {
         /* Se hace un do-while loop para preguntar al usuario por el tipo
         de entrada hasta que ingrese una correctamente
         
-        En la linea 72 Se lee lo que escribio el usuario,
+        En la linea 78 Se lee lo que escribio el usuario,
         se lleva a letras minusculas con "toLowerCase()" y se eliminan
         los espacios vacios del principio y el final con "trim()" */
 
-        boolean match = false;
-        
+        boolean match = false;        
         
         do {
             System.out.print("Indique tipo de entrada (VIP, Platea baja, Platea alta o Palco): ");  
@@ -137,43 +135,35 @@ public class Main {
                 }
             } else
             System.out.println("Por favor ingrese una edad valida");
-        } while (match != true);
+        } while (match != true);        
 
-        entradasVendidas++;     //al terminar la compra se suma una entrada vendida
-
-        if(descuentoEstudiante != 0)
+        if(descuentoEstudiante != 0)        //se verifican los descuentos independientes del otro
             descuentoEstudiante = precioZona * 0.1;
 
         if(descuentoEdad != 0)
             descuentoEdad = precioZona * 0.15;
 
-        precioFinal = (int)(precioZona - descuentoEdad - descuentoEstudiante);
-        
+        precioFinal = (int)(precioZona - descuentoEdad - descuentoEstudiante);        
         
         gastoTotal += precioFinal;       //se suma el precio final al gasto total
+
+        Boleto boleto = new Boleto(tipoDeEntrada,
+                edad,
+                precioZona,
+                descuentoEstudiante,
+                descuentoEdad,
+                aplicaDescuentoEstudiante,
+                aplicaDescuentoEdad,
+                precioFinal);
         
         //Y al final le damos el precio al usuario y nos despedimos
-        //Se repite el mismo proceso hasta que el usuario presione 3 (salir)
+        //Se repite el mismo proceso hasta que el usuario presione 5 (salir)
 
-        if (descuentoEstudiante != 0)
-            aplicaDescuentoEstudiante = "Descuento Estudiante: 10%" + "\n";
+        boleto.imprimir();     //La compra que acaba de hacer
 
-        if (descuentoEdad != 0)
-            aplicaDescuentoEdad = "Descuento Tercera edad: 15%" + "\n";
+        boletaFinal.add(boleto);      //Se guarda la compra junto a las otras que haga
+        entradasVendidas++;     //al terminar la compra se suma una entrada vendida
 
-        boleta = ("----------------------------------"+"\n"+
-                    "Zona: " + tipoDeEntrada + "\n" +
-                    "Precio base: $ " + precioZona + "\n" +
-                    aplicaDescuentoEstudiante +
-                    aplicaDescuentoEdad +
-                    "Precio final: $ " + precioFinal + " pesos" + "\n" +
-                    "----------------------------------"+"\n");
-
-        System.out.println(boleta);     //La compra que acaba de hacer
-
-        boletaFinal.add(boleta);      //Se guarda la compra junto a las otras que haga
-
-        return(boleta);
     }
 
     static void editar() {
@@ -197,8 +187,7 @@ public class Main {
             
             scan.nextLine();
             entradasVendidas--;     //se resta una entrada al total de entradas vendidas
-            String[] precioBoleta = boletaFinal.get(numeroBoleto).split(" ");      //se hace una lista del boleto separado por espacios
-            gastoTotal -= Integer.valueOf(precioBoleta[precioBoleta.length - 2]);     //se resta el precio del boleto al gasto total
+            gastoTotal -= boletaFinal.get(numeroBoleto).precioFinal;     //se resta el precio del boleto al gasto total
             boletaFinal.remove(numeroBoleto);     //se elimina el boleto viejo
             comprar();      //se compra uno nuevo
 
@@ -228,9 +217,9 @@ public class Main {
             }
 
             entradasVendidas--;     //se resta una entrada al total de entradas vendidas
-            String[] precioBoleta = boletaFinal.get(numeroBoleto).split(" ");      //se hace una lista del boleto separado por espacios
-            gastoTotal -= Integer.valueOf(precioBoleta[precioBoleta.length - 2]);     //se resta el precio del boleto al gasto total
+            gastoTotal -= boletaFinal.get(numeroBoleto).precioFinal;     //se resta el precio del boleto al gasto total
             boletaFinal.remove(numeroBoleto);       //se elimina el boleto
+            
             System.out.println("\n" + "-----------------------------------------------------");
             System.out.println("Boleto eliminado exitosamente");
             System.out.println("-----------------------------------------------------" + "\n");
@@ -261,7 +250,7 @@ public class Main {
         System.out.println("DETALLE DE COMPRA:");     //se muestran todas las compras que realizo
         int boletaFinalSize = boletaFinal.size();       //se optimiza el codigo
         for(int i = 0; i < boletaFinalSize; i++) {
-            System.out.println(boletaFinal.get(i));
+            boletaFinal.get(i).imprimir();
         }
         System.out.println("===== BOLETA ELECTRONICA =====");
         System.out.println("=====     TEATRO MORO    =====");
